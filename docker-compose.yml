@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+  php:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./app/:/var/www/html/
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:10.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - backend
+
+  phpmyadmin:
+    image: phpmyadmin:5.0
+    restart: always
+    environment:
+      - MYSQL_USER:myuser
+      - MYSQL_PASSWORD:mypassword
+      - PMA_ARBITRARY=1
+      - PHA_HOST:mariadb
+    ports:
+      - 8080:80
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - mariadb
+networks:
+  frontend:
+  backend:
+
+volumes:
+  mariadb:
+    driver: local
