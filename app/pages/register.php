@@ -7,10 +7,24 @@
 
 /// used to register users
 /// also used to activate accounts, when the user clicks on the registration code to activate the account
+// PROCESS THE ACCOUNT ACTIVATION 
+if(isset($_GET['code']) && isset($_GET['email'])){
+  $code = filter_var($_GET['code'], FILTER_SANITIZE_STRING);
+  $email = filter_var($_GET['email'], FILTER_SANITIZE_EMAIL);
+  
+  if(!empty($email) && !empty($code)){
+    // activate the account with the code
+    $verify = $user->verifyAccount($email, $code);
+    if(isset($verify['success'])){
+      $messages['success'] = "Your Account was Successfully Activated!";
+    }if(isset($verify['error'])){
+      $messages['success'] = "There was an error activating your account";
+    }
+  }       
+}
 
 // fname, lname, username, email, password
 // PROCESS THE REGISTRATION
-
 if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])){
 
     $fname = filter_var($_POST['fname'], FILTER_SANITIZE_STRING);
@@ -18,8 +32,12 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
     $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $pass = $_POST['password'];
+    $confPass = $_POST['confirm-password'];
 
-    if(empty($fname)){
+
+    if($pass != $confPass){
+      $messages['danger'] = "Password is not the Same";
+    }elseif(empty($fname)){
         $messages['danger'] = "Empty First Name";
     }elseif(empty($lname)){
         $messages['danger'] = "Empty Last Name";
@@ -86,6 +104,11 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
           <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+          </div>
+
+          <div class="form-group">
+            <label for="password">Confirm Password</label>
+            <input type="password" class="form-control" name="confirm-password" id="confirm-password" placeholder="Confirm Password">
           </div>
 
           <br/>

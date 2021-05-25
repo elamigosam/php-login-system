@@ -1,4 +1,6 @@
 <?php
+// this was moved to /pages/sub/users.php
+die();
 if(!$user->isAdmin()){  
   header("Location: home");
   die();

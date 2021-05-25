@@ -30,3 +30,5 @@ Disable or enable Accounts<br/>
 
 # Features
 Roles: allows a user to have more than one role, 
+The admin.php page includes files within it to display different sections of its page.
+else it displays a default main page. 
