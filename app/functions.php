@@ -1,7 +1,11 @@
 <?php
 
 
-include(__DIR__.'/env.php');
+if (file_exists($directory.'/env.php')) {
+  require($directory.'/env.php');
+}else{
+  die("Failed to find env file");
+}
 
 //SET required variables
 date_default_timezone_set('UTC');

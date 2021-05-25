@@ -187,9 +187,9 @@ class User{
                 Your account has been created successfully.<br/>
                 <hr/>
                                   
-                Please click this <a href="'.$url.'/register.php?email='.$email.'&code='.$code.'">link</a> to activate your account:<br/>
+                Please click this <a href="'.$url.'/register?email='.$email.'&code='.$code.'">link</a> to activate your account:<br/>
                 or copy and paste this url on your browser:<br/>
-                '.$url.'/register.php?email='.$email.'&code='.$code.'
+                '.$url.'/register?email='.$email.'&code='.$code.'
                    
                     ';
                     $send = smtpMail($email, $subject, $message);
