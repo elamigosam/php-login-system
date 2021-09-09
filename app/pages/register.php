@@ -62,7 +62,7 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
   
   <?php 
   // setup var for the header
-  $title = "Login";
+  $title = "Register | PHP Login System";
   include ($directory.'/include/header.php');
   ?>
   

@@ -52,7 +52,7 @@ if(isset($_POST['submit']) && isset($_POST['email']) && isset($_POST['password']
 
 <?php 
 // setup var for the header
-$title = "Login";
+$title = "Login | PHP Login System";
 include (__DIR__.'/../include/header.php'); 
 ?>
 

@@ -28,7 +28,7 @@ if(isset($_GET['msg'])){
 
 
 // INCLUDE THE HEADER TO INCLUDE THE NAV AND MENUS.
-$title = "Home"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Admin | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
 include ($directory.'/include/header.php');
 include ($directory.'/include/nav.php');
 

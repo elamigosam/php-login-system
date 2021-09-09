@@ -23,7 +23,7 @@ if($user->isAdmin()){
 ?>
 <?php
 // INCLUDE THE HEADER TO INCLUDE THE NAV AND MENUS.
-$title = "Home"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Options | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
 include (__DIR__.'/../include/header.php');
 include(__DIR__.'/../include/nav.php');
 ?>

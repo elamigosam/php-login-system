@@ -10,7 +10,7 @@ if(!$userInfo){
 
 //$debug = $userInfo;
 
-$title = "Home"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Home | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
 include ($directory.'/include/header.php');
 include ($directory.'/include/nav.php');
 ?>

@@ -8,7 +8,7 @@ $dbname = 'mydatabase';
 
 //SMTP Email settings:
 $enableSmtp = false;
-$host = "smtp.gmail.com";
+$smtpHost = "smtp.gmail.com";
 $smtpUsername = "username@gmail.com";
 $smtpPassword = 'Password123'; 
 $smtpPort = 587; 

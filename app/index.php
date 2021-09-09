@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+//echo "<pre>";
+//print_r($_SERVER);
+//echo "</pre>";
+
 /*
 Start session
 Define Variables 
@@ -15,15 +23,12 @@ load the page
 /*
 DEFINE SOME VARIABLES 
 */
+$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+$WebsiteName = "PHP Login System";
 $directory = $_SERVER['DOCUMENT_ROOT'];
-//$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+$currentUrl = $url.$_SERVER['REQUEST_URI'];
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-//echo "<pre>";
-//print_r($_SERVER);
-//echo "</pre>";
+
 
 /*
 The REQUEST_URI is split by the ?
@@ -34,19 +39,6 @@ array("Folder", "Sample-Page-Title")
 $request_uri = explode( "?", $_SERVER['REQUEST_URI']); // split the path from the query 
 $url_path = array_values(array_filter(explode("/", $request_uri['0']))); // array of different paths with removed empty arrays
 
-/*
-// this is a work in progress that might not be needed since we can use $_GET 
-echo "Query:<br/>";
-$url_query = explode("&", $request_uri['1']);
-$url_querys = array_filter(explode("&", $request_uri['1'])); // array of different key=value with removed empty arrays
-foreach($url_querys as $url_query){
-    $q = explode("=", $url_query);
-    $url_querys[$q[0]] = $q[1];
-}
-echo "<pre>";
-var_dump($url_querys);
-echo "</pre>";
-*/
 
 //var_dump($url_path);
 
