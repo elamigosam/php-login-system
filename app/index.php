@@ -62,6 +62,7 @@ $user = new User();
 // FIGURE OUT WHEATER A USER IS LOGED IN.
 if($user->sessionLogin()){
   $auth = true;
+  $userInfo = $user->getUserInfoById();
 }else{
   $auth = false;
 }
