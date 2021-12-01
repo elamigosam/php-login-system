@@ -22,13 +22,13 @@ date_default_timezone_set('UTC');
 
 
 /////////// Create a MYSQLI instance ///////////
-$link = mysqli_connect($host, $user, $passwd, $dbname);
+$links = mysqli_connect($host, $user, $passwd, $dbname);
 // Check connection
-if (!$link) {
+if (!$links) {
   die("Connection failed: " . mysqli_connect_error());
 }
 
-if (!mysqli_set_charset($link, "utf8")) {
+if (!mysqli_set_charset($links, "utf8")) {
   printf("Error loading character set utf8: %s\n", mysqli_error($link));
   die();
 }

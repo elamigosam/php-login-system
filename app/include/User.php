@@ -18,7 +18,6 @@ class User{
     }
 
     public function editAccountPassword(string $newPass){ // RETURNS array WITH MESSAGES danger OR success
-        global $link;
         global $pdo;
         
         if(!$this->isPasswdValid($newPass)){
@@ -143,7 +142,6 @@ class User{
 
 
     public function addAccount(string $fname, string $lname, string $username, string $email, string $passwd){ // RETURNS array WITH MESSAGES danger OR success
-        global $link;
         global $url;
         global $pdo;
 
