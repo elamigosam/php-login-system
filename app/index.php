@@ -17,14 +17,15 @@ Load User class
 Try to login with sessionLogin() and set $auth (true/false)
 check if the selected page exists
 load the page
-*/
 
-
-/*
 DEFINE SOME VARIABLES 
 */
 $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+// siteName is used for the second part of the title tag
+$siteName = "PHP Login System";
+//directory is used to include scripts or files
 $directory = $_SERVER['DOCUMENT_ROOT'];
+// currentUrl gives the current url of the loaded page, for displaying the url. 
 $currentUrl = $url.$_SERVER['REQUEST_URI'];
 
 
@@ -75,7 +76,6 @@ if(file_exists($directory."/pages/".$page.".php")){
 
 else{
   // FILE DOESNT EXIST, THERE FOR IS AN INVALID PAGE, INCLUDE 404 PAGE
-  echo "Bad File";
   include $directory."/pages/404.php";
 }
 ?>

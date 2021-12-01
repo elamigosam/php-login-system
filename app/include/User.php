@@ -108,7 +108,7 @@ class User{
                 return array('danger'=>"Wrong password");
             }
         }else{
-            return array('danger'=>"Failed to Find Account");
+            return array('danger'=>"Failed to Find Account,<br/> or your account might need to be activated!");
         }
 	}
 
@@ -139,12 +139,13 @@ class User{
     public function sisUser(){
         return $this->isUser;
     }    
-    ///////////////////////////////////// functions converted to PDO ^^
+
 
 
     public function addAccount(string $fname, string $lname, string $username, string $email, string $passwd){ // RETURNS array WITH MESSAGES danger OR success
         global $link;
         global $url;
+        global $pdo;
 
         $fname = filter_var(trim($fname), FILTER_SANITIZE_STRING);
         $lname = filter_var(trim($lname), FILTER_SANITIZE_STRING);
@@ -176,9 +177,15 @@ class User{
             // Generate random 32 character hash and assign it to a local variable.// Example output: f4552671f8909587cf485ea990207f3b
             $code = md5( rand(0,1000) ); 
 
-            $q = "INSERT INTO `users` (fname, lname, username, email, password, code, isActive, created_at) VALUES ('".mysqli_escape_string($link, $fname)."', '".mysqli_escape_string($link, $lname)."', '".mysqli_escape_string($link, $username)."', '".mysqli_escape_string($link, $email)."', '$hash', '$code', 0, NOW())";
-            if($r = mysqli_query($link, $q)){
-                $last_id = mysqli_insert_id($link);
+
+            //$q = "INSERT INTO `users` (fname, lname, username, email, password, code, isActive, created_at) VALUES ('".mysqli_escape_string($link, $fname)."', '".mysqli_escape_string($link, $lname)."', '".mysqli_escape_string($link, $username)."', '".mysqli_escape_string($link, $email)."', '$hash', '$code', 0, NOW())";
+            $q = "INSERT INTO `users` (fname, lname, username, email, password, code, isActive, created_at) 
+            VALUES (:fname, :lname, :username, :email, '$hash', '$code', 0, NOW())";
+            $stmt = $pdo->prepare($q);
+            $stmt->execute(['fname' => $fname, 'lname'=> $lname, 'username' => $username, 'email' => $email]);
+            if($stmt->rowCount() > 0){
+
+                $last_id = $pdo->lastInsertId();
 
                 // BUILD VERIFICATION EMAIL 
                 $subject = 'Signup | Verification';
@@ -190,59 +197,66 @@ class User{
                 Please click this <a href="'.$url.'/register?email='.$email.'&code='.$code.'">link</a> to activate your account:<br/>
                 or copy and paste this url on your browser:<br/>
                 '.$url.'/register?email='.$email.'&code='.$code.'
-                   
                     ';
                     $send = smtpMail($email, $subject, $message);
                     return $send;
-
-                
             }
             else{
-                echo $q."<br/>";
-                echo mysqli_error($link);
+                
+                //echo $q."<br/>";
+                //echo mysqli_error($link);
                 return array('danger' => "There was a Database Issue!");
             }
         }    
         return array('danger' => "There was an Issue");
     }
 
+
+
+
     function getIdFromEmail(string $email): ?int{ // RETURNS FALSE OR id NUMBER
         // returns false or ID number
-        global $link;
+        global $pdo;
+        
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
         if(empty($email)){
             return false;
         }
-        $q = "SELECT id FROM `users` WHERE email = '$email' ";
-        if($r = mysqli_query($link, $q)){
-            if(mysqli_num_rows($r) == 1){
-                return true;
-            }else{
-                return false;
-            }
+
+        $q = "SELECT id FROM `users` WHERE email = :email ";
+        $stmt = $pdo->prepare($q);
+        $stmt->execute(['email'=>$email]);
+        $user = $stmt->fetch();
+    
+
+
+        if($stmt->rowCount() == 1){
+            return true;
         }
         else{
             //echo mysqli_error($link);
+            return false;
             die("Database Error");
         }
     }
 
 
-
-
-
-
-
     public function sessionLogin(): bool{ // RETURNS TRUE AND SETS id, email, authenticated and roles. 
-        global $link;
+        global $pdo;
+
         if (session_status() == PHP_SESSION_ACTIVE){
             $sessionId = session_id();
 
             $q = "SELECT * FROM sessions, users WHERE (sessions.session_id = '$sessionId') " . "AND (sessions.login_time >= (NOW() - INTERVAL 7 DAY)) AND (sessions.account_id = users.id) " . "AND (users.isActive = 1)";
             //echo $q;
-            if($r = mysqli_query($link, $q)){
-                if(mysqli_num_rows($r) == 1){
-                    $row = mysqli_fetch_assoc($r);
+            $stmt = $pdo->prepare($q);
+            $stmt->execute();
+            $user = $stmt->fetch();
+
+
+            if($stmt->rowCount() == 1){
+                
+                    $row = $user; //mysqli_fetch_assoc($r);
                     $this->id = intval($row['account_id'], 10);
                     $this->email = $row['email'];
                     $this->authenticated = TRUE;
@@ -252,11 +266,10 @@ class User{
                    
                     //$this->roles = $row['roles'];
                     return true;
-                }else{
-                    return false;
-                }
+                
             }
             else{
+                return false;
                 //echo mysqli_error($link);
                 die("Database Error S");
             }
@@ -264,14 +277,15 @@ class User{
         }
     }
 
+
+
+
     public function getUserInfoById(){ //RETURNS false OR info object
-        global $link;
         global $pdo;
 
         // ID is setup at the class level: $this->id;
         $q = "SELECT id, fname, lname, username, email, mobile, isActive FROM users WHERE id = :id LIMIT 1";  
         $stmt = $pdo->prepare($q); 
-        
         
         //$result =  // get the mysqli result
         //$user = $result->fetch_assoc(); // fetch data  
@@ -291,9 +305,10 @@ class User{
         }
         return false;
     }
+     ///////////////////////////////////// functions converted to PDO ^^
 
     public function logout(){
-        global $link;
+        global $pdo;
         $this->id = NULL;
         $this->name = NULL;	
         $this->authenticated = FALSE;
@@ -302,17 +317,17 @@ class User{
             $sid = session_id();
             $q = 'DELETE FROM sessions WHERE `session_id` = "'.$sid.'"';
             //echo $q;
-            if(mysqli_query($link, $q)){
+            $stmt = $pdo->prepare($q);
+
+            if($stmt->execute()){
                 return true;            
             }
             else{
                 //echo mysqli_error($link);
+                return false;
                 die("Database Error Login");
             }
-
         }
-
-
     }
 
     private function validateEmail($email){
@@ -324,40 +339,37 @@ class User{
     }
 
 
-
-
-
     function verifyAccount($email, $code){ // RETURNS ARRAY: array('success'=>"Success Message")
-        global $link;
+        global $pdo;
         $code = filter_var($_GET['code'], FILTER_SANITIZE_STRING);
         $email = filter_var($_GET['email'], FILTER_SANITIZE_EMAIL); 
 
         if(!empty($code) && !empty($email)){
 
-            $q = "UPDATE `users` SET isActive=1 WHERE code='$code' AND email='$email'";
-            if($r = mysqli_query($link, $q)){
-                $affected = mysqli_affected_rows($link);
-                if($affected > 0){
+            $q = "UPDATE `users` SET isActive=1 WHERE code=:code AND email=:email";
+            $stmt = $pdo->prepare($q);
+
+
+            if($stmt->execute(['code'=>$code,'email'=>$email])){
+                $affected = $stmt->rowCount();
+                //$affected = mysqli_affected_rows($link);
+                if($affected == 1){
                     return array('success' => "Activated your account successfully.");
                 }elseif($affected == 0){
                     return array('danger' => "Failed to Activate your Account.");
-                }elseif($affected < 0){
+                }elseif($affected < 1){
                     //echo $q;
+                    return array('danger'=> "Failed to Activate your account");
                     //echo mysqli_error($link);
-                    die();
+                    //die();
                 }
-
-                
             }else{
                 //echo $q;
                 //echo mysqli_error($link);
                 return array('danger' => "There was a Database Issue!");
             }
         }
-
-
     }
-
 }
 
 ?>

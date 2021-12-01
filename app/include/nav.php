@@ -18,7 +18,16 @@ if(!isset($title)){
     </button>
 
 
-    <?php if(isset($user)){ ?>
+    <?php if($auth){ 
+      // guest visitor menu options 
+      ?>
+
+
+
+
+    <?php if(isset($user)){ 
+      // authenticated user visitor menu options
+      ?>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
@@ -78,6 +87,8 @@ if(!isset($title)){
 				
 
   </div>
+
+  <?php } ?>
 
   <?php } ?>
 </nav>
