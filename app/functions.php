@@ -35,10 +35,18 @@ if (!mysqli_set_charset($links, "utf8")) {
 
 
 
-/* Returns $data array()
-data['error']
-data['result']
-data['count']
+/*
+Used to send sql queries to sql server through pdo. 
+->accepts:
+$query: the actual text query
+$placeholders: array of placeholders for pdo
+->returns:
+$data = array()
+On failed: 
+ $data['error'] // contains the error details. 
+On success: 
+ $data['result'] // contains the result array
+ $data['count'] // contains the total count
 */
 function sql_query($query, $placeholders = false){
   $data = array();
