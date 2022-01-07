@@ -1,10 +1,12 @@
 # php-login-system
-php login system with registration and user management. My verry first project that I make public, if you have any suggestions or would like to contribute to it, you are welcome to.  I would like to make sure this is a secure login system. 
+php login system with registration and user management. My very first project that I make public, if you have any suggestions or would like to contribute to it, you are welcome to.  I would like to make sure this is a secure login system. 
 # Setup
 Clone the project,<br/>
 Rename the file env_sample.php to env.php<br/>
 Change configuration on env file to meet your needs. <br/>
-After that its a typical Docker compose deployment, default user credentials are the following: 
+You will need to import the database.sql file to the database. <br/>
+
+The default user credentials are the following: 
 <br/>
 # Default Users
 Admin<br/>
