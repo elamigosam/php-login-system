@@ -3,9 +3,14 @@
 This page comes from index.php
 we need to make sure user is authenticated else redirect to home. 
 */
-if(!$user->isAdmin() && !$auth){
-    //header("Location: home");
-    die("Redirect Home from Admin");
+if(!$user->isAdmin()){
+  // redirect Home
+  header("Location: /");
+  die("Redirect Home from Admin");
+}
+if(!$page == "admin"){
+  header("Location: home");
+  die("Redirect Home from Admin");
 }
 
 // GET THE USER INFO 
