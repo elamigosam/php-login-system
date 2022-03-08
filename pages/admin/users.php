@@ -1,14 +1,15 @@
 <?php
 
-if(!$user->isAdmin() && !$auth){
-  //header("Location: home");
+if(!$user->isAdmin()){
+  // redirect Home
+  header("Location: /");
+  die("Redirect Home from Admin");
+}
+if(!$page == "admin"){
+  header("Location: home");
   die("Redirect Home from Admin");
 }
 
-if(!$page == "admin"){
-  //header("Location: home");
-  die("Redirect Home from Admin");
-}
 
 // SETUP THE VARIABLES 
 $msgs = array(); // variable to store the messages requred by msgs()
