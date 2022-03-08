@@ -30,7 +30,7 @@ class User{
         $stmt = $pdo->prepare($q);
         if($stmt->execute(['id'=>$this->id, 'newHash'=>$newHash, 'email'=>$this->email])){
             if($stmt->rowCount() == 1){
-                return array('success'=>"Successfully Updated Your Information.");
+                return array('success'=>"Successfully Updated Your Password.");
             }else{
                 return array('danger'=>"Failed to Update your password");
             }
@@ -47,7 +47,7 @@ class User{
         }
         return true;
     }
-
+    
     public function editAccountInfo($username, $fname, $lname, $email, $mobile){ // RETURNS array WITH MESSAGES danger OR success
         global $pdo;
 
@@ -76,7 +76,7 @@ class User{
                 if($stmt->rowCount() == 1){
                     return array('success'=>"Successfully Updated Your Information.");
                 }else{
-                    return array('danger'=>"Failed to Update your Information");
+                    return array('danger'=>"No Change was recorded!");
                 }
             }else{
                 return array('danger'=>"Database Error");
@@ -133,13 +133,7 @@ class User{
 
     public function isAdmin(){
         return $this->isAdmin;
-    }
-
-    public function sisUser(){
-        return $this->isUser;
-    }    
-
-
+    }   
 
     public function addAccount(string $fname, string $lname, string $username, string $email, string $passwd){ // RETURNS array WITH MESSAGES danger OR success
         global $url;
@@ -175,12 +169,13 @@ class User{
             // Generate random 32 character hash and assign it to a local variable.// Example output: f4552671f8909587cf485ea990207f3b
             $code = md5( rand(0,1000) ); 
 
-
-            //$q = "INSERT INTO `users` (fname, lname, username, email, password, code, isActive, created_at) VALUES ('".mysqli_escape_string($link, $fname)."', '".mysqli_escape_string($link, $lname)."', '".mysqli_escape_string($link, $username)."', '".mysqli_escape_string($link, $email)."', '$hash', '$code', 0, NOW())";
-            $q = "INSERT INTO `users` (fname, lname, username, email, password, code, isActive, created_at) 
-            VALUES (:fname, :lname, :username, :email, '$hash', '$code', 0, NOW())";
+            $q = "INSERT INTO `users`(fname, lname, username, email, password, code, isActive, isAdmin, created_at) VALUES (:fname, :lname, :username, :email, :hash, :code, 0, 0, NOW())";
             $stmt = $pdo->prepare($q);
-            $stmt->execute(['fname' => $fname, 'lname'=> $lname, 'username' => $username, 'email' => $email]);
+            $stmt->execute(['fname'=>$fname,'lname'=>$lname,'username'=>$username,'email'=>$email,'hash'=>$hash,'code'=>$code]);
+
+            //echo "\nPDOStatement::errorInfo():\n";
+            //print_r($stmt->errorInfo());
+            
             if($stmt->rowCount() > 0){
 
                 $last_id = $pdo->lastInsertId();
@@ -198,8 +193,7 @@ class User{
                     ';
                     $send = smtpMail($email, $subject, $message);
                     return $send;
-            }
-            else{
+            }else{
                 
                 //echo $q."<br/>";
                 //echo mysqli_error($link);
@@ -208,8 +202,6 @@ class User{
         }    
         return array('danger' => "There was an Issue");
     }
-
-
 
 
     function getIdFromEmail(string $email): ?int{ // RETURNS FALSE OR id NUMBER
@@ -238,7 +230,6 @@ class User{
         }
     }
 
-
     public function sessionLogin(): bool{ // RETURNS TRUE AND SETS id, email, authenticated and roles. 
         global $pdo;
 
@@ -247,36 +238,32 @@ class User{
 
             $q = "SELECT * FROM sessions, users WHERE (sessions.session_id = '$sessionId') " . "AND (sessions.login_time >= (NOW() - INTERVAL 7 DAY)) AND (sessions.account_id = users.id) " . "AND (users.isActive = 1)";
             //echo $q;
-            $stmt = $pdo->prepare($q);
-            $stmt->execute();
-            $user = $stmt->fetch();
-
-
-            if($stmt->rowCount() == 1){
-                
-                    $row = $user; //mysqli_fetch_assoc($r);
-                    $this->id = intval($row['account_id'], 10);
-                    $this->email = $row['email'];
-                    $this->authenticated = TRUE;
+            if($stmt = $pdo->prepare($q)){
+                $stmt->execute();
+                $user = $stmt->fetch();
+                if($stmt->rowCount() == 1){
+                        $row = $user; //mysqli_fetch_assoc($r);
+                        $this->id = intval($row['account_id'], 10);
+                        $this->email = $row['email'];
+                        $this->authenticated = TRUE;
+                        $this->isAdmin = ($row['isAdmin'] == 1 ? true : false);
+                        $this->isUser = ($row['isUser'] == 1 ? true : false);
                     
-                    $this->isAdmin = ($row['isAdmin'] == 1 ? true : false);
-                    $this->isUser = ($row['isUser'] == 1 ? true : false);
-                   
-                    //$this->roles = $row['roles'];
-                    return true;
-                
-            }
-            else{
-                return false;
-                //echo mysqli_error($link);
-                die("Database Error S");
+                        //$this->roles = $row['roles'];
+                        return true;
+                    
+                }else{
+                    return false;
+                    //echo mysqli_error($link);
+                    die("Database Error S");
+                }
+            }else{
+                // query failed
+                die("There was a Database Error");
             }
             return false;
         }
     }
-
-
-
 
     public function getUserInfoById(){ //RETURNS false OR info object
         global $pdo;
@@ -335,7 +322,6 @@ class User{
         }
         return true;
     }
-
 
     function verifyAccount($email, $code){ // RETURNS ARRAY: array('success'=>"Success Message")
         global $pdo;

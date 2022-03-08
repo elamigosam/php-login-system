@@ -7,6 +7,8 @@ if(!$userInfo = $user->getUserInfoById()){
     die();
 }
 
+// SETUP THE VARIABLES 
+$msgs = array(); // variable to store the messages requred by msgs()
 
 //  PROCESS the update info 
 if(isset($_POST['update-info'])){
@@ -16,16 +18,18 @@ if(isset($_POST['update-info'])){
     $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
     $mobile = filter_var(trim($_POST['mobilePhone']), FILTER_SANITIZE_STRING);
     if(empty($username)){
-        $msg['danger'] = "Username Must Not be Empty";
+        //$msg['danger'] = "Username Must Not be Empty";
+		$msgs[] = array('danger'=>"Username Must Not be Empty");
     }elseif(empty($fname)){
-        $msg['danger'] = "First Name Must Not be Empty";
+        $msgs[] = array('danger'=>"First Name Must Not be Empty");
     }elseif(empty($lname)){
-        $msg['danger'] = "Last Name Must Not be Empty";
+        $$msgs[] = array('danger'=>"Last Name Must Not be Empty");
     }elseif(empty($email)){
-        $msg['danger'] = "Email Must Not be Empty";
+        $msgs[] = array('danger'=>"Email Must Not be Empty");
     }else{
         // continue after the checks.
-        $msg = $user->editAccountInfo($username, $fname, $lname, $email, $mobile);     
+        $msgs[] = $user->editAccountInfo($username, $fname, $lname, $email, $mobile);  
+		//print_r($msgs);   
 	} 
 }
 
@@ -35,11 +39,12 @@ if(isset($_POST['update-password'])){
 		//print_r($_POST);
 		$newPass = $_POST['new-pass'];
 		if(!empty($oldPass) || !empty($newPass)){
-			$msg = $user->editAccountPassword($newPass);
-		} 
-	}
-	else{
-		$msg['danger'] = "Passwords Do Not Match!";
+			$msgs[] = $user->editAccountPassword($newPass);
+		}else{
+			$msgs[] = array('danger'=>"Cannot use Empty passwords");
+		}
+	}else{
+		$msgs[] = array('danger'=>"Passwords Do Not Match!");
 	}
 }
 
@@ -54,12 +59,9 @@ if(!$getUinfo = $user->getUserInfoById()){
 
 ?>
 
-
-
-
 <?php
 // INCLUDE THE HEADER TO INCLUDE THE NAV AND MENUS.
-$title = "Account | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Account | ".$WebsiteName; // SETUP THE TITLE VAR FOR THE title tag
 include (__DIR__.'/../include/header.php');
 include(__DIR__.'/../include/nav.php');
 ?>
@@ -72,11 +74,12 @@ include(__DIR__.'/../include/nav.php');
 <?php 
       if(isset($msg) && !empty($msg)){
         foreach ($msg as $key=>$message ){
-          echo "<div class='alert alert-$key' role='alert'>".$message."</div>";         
+          echo "<div class='alert alert-$key' role='alert'>OLD".$message."</div>";         
         }
       }
   ?>
-  <div class="row">
+  <div class="row my-5">
+    <?php msgs($msgs) ?>
     <h3>Update your Info</h3>
 	<div class="col">
 	  <form action="/account" method="post">
@@ -97,7 +100,7 @@ include(__DIR__.'/../include/nav.php');
 
 		<div class="form-group">
 			<label for="inputEmail4">Email</label>
-			<input type="email" class="form-control" id="inputEmail4" placeholder="Email" name="email" value="<?php echo $getUinfo['email']; ?>">
+			<input readonly type="email" class="form-control" id="inputEmail4" placeholder="Email" name="email" value="<?php echo $getUinfo['email']; ?>">
 		</div>
 
 		<div class="form-group">

@@ -1,8 +1,7 @@
 <?php
-// REDIRECT TO LOGIN IS USER IS NOT LOGEDIN. 
+// REDIRECT TO LOGIN ROOT IF NO PAGE TITLE
 if(!isset($title)){
-  //redirect to home page
-  header("Location: login");
+  header("Location: /");
   die();
 }
 ?>
@@ -18,12 +17,6 @@ if(!isset($title)){
   
   <body >
   <?php
-  if(isset($auth)){
-      if($auth == true){
-          //echo "Internal Nav Bar"; ?>
-          <?php
-      }
-  }else{
-      //echo "External Nav Bar";
-  }
+ 
+  
   ?>

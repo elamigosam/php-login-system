@@ -1,10 +1,21 @@
 <?php
 // login page
 
-/* Include the Account class file */
-//require __DIR__.'/../functions.php';
-//require __DIR__.'/../include/User.php';
-//$user = new User();
+// SETUP THE VARIABLES 
+$msgs = array(); // variable to store the messages requred by msgs()
+
+
+
+
+// PROCESS ANY MESSAGES FROM THE URL
+if(isset($_GET['msg'])){
+  if($_GET['msg'] == "logout"){
+    $msgs[] = array('danger'=>"Logout Successful");
+  }
+  if($_GET['msg'] == "register"){
+    $msgs[] = array('success'=>"You account was created successfully,<br/> check your email for an activation link to activate your account.");
+  }
+}
 
 // TRY TO LOGIN WITH PHP SESSIONS
 if($login = $user->sessionLogin()){
@@ -13,18 +24,9 @@ if($login = $user->sessionLogin()){
   die();
 }
 
-// PROCESS ANY MESSAGES FROM THE URL
-if(isset($_GET['msg'])){
-  if($_GET['msg'] == "logout"){
-    $messages['danger'] = "Logout Successful";
-  }
-  if($_GET['msg'] == "register"){
-    $messages['success'] = "You account was created successfully,<br/> check your email for an activation link to activate your account.";
-  }
-}
-
 if(isset($_GET['activate'])){
-  $messages = $_GET['activate']; 
+  //$messages = $_GET['activate'];
+  $msgs[] = array('info'=>$_GET['activate']);
 }
 
 // PROCESS THE LOGIN WITH USERNAME AND PASSSWORD
@@ -33,44 +35,41 @@ if(isset($_POST['submit']) && isset($_POST['email']) && isset($_POST['password']
   $pass = $_POST['password'];
 
   if(empty($email)){
-    $messages['danger'] = "Please enter an email address";
+    $msgs[] = array('danger'=>"Please enter an email address");
   }elseif(empty($pass)){
-    $messages['danger'] = "Please enter a Password";
+    $msgs[] = array('danger'=>"Please enter a Password");
   }else{
     $login = $user->login($email, $pass);
     if(isset($login['success'])){
-      $messages = $login;
+      //$msgs[] = $login;
       //redirect to home page. 
       header("Location: /home");
-    }
-    else{
-      $messages = $login;
+    }else{
+      $msgs[] = $login;      
     }
   }
 }
-?>
 
-<?php 
+
 // setup var for the header
-$title = "Login | PHP Login System";
+$title = "Login | ".$WebsiteName;
 include (__DIR__.'/../include/header.php'); 
 ?>
 
 <div class="container">
-<div class="row">
-    <div class="col">
-    </div>
-    <div class="col text-center">
+  <div class="row justify-content-center my-5">
+  <?php msgs($msgs) ?>
+    <div class="col-lg-4 col-sm-12 col-md-6 text-center">
       <h3>Login</h3>
       <br/>
-      <?php 
+
+      <?php /* old code replaced by function 
       if(isset($messages) && !empty($messages)){
         foreach ($messages as $key=>$message ){
           echo "<div class='alert alert-$key' role='alert'>".$message."</div>";         
         }
-      }
+      } */
   ?>
-      
       <form method="POST" action="/login">
         <div class="form-group">
           <label for="email">Email address</label>
@@ -87,8 +86,6 @@ include (__DIR__.'/../include/header.php');
         <a href="register" role="button" class="btn btn-link">Signup</a>
         
       </form>
-    </div>
-    <div class="col">
     </div>
 </div>
 </div> 

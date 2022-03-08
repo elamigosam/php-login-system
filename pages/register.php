@@ -1,12 +1,11 @@
-
-
-
-
 <?php
-
 
 /// used to register users
 /// also used to activate accounts, when the user clicks on the registration code to activate the account
+
+// SETUP THE VARIABLES 
+$msgs = array(); // variable to store the messages requred by msgs()
+
 // PROCESS THE ACCOUNT ACTIVATION 
 if(isset($_GET['code']) && isset($_GET['email'])){
   $code = filter_var($_GET['code'], FILTER_SANITIZE_STRING);
@@ -16,9 +15,9 @@ if(isset($_GET['code']) && isset($_GET['email'])){
     // activate the account with the code
     $verify = $user->verifyAccount($email, $code);
     if(isset($verify['success'])){
-      $messages['success'] = "Your Account was Successfully Activated!";
+      $msgs[] = array('success'=>"Your Account was Successfully Activated!");
     }if(isset($verify['error'])){
-      $messages['success'] = "There was an error activating your account";
+      $msgs[] = array('danger'=>"There was an error activating your account");
     }
   }       
 }
@@ -34,51 +33,53 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
     $pass = $_POST['password'];
     $confPass = $_POST['confirm-password'];
 
-
-    if($pass != $confPass){
-      $messages['danger'] = "Password is not the Same";
-    }elseif(empty($fname)){
-        $messages['danger'] = "Empty First Name";
+    if(empty($fname)){
+      $msgs[] = array('danger'=>"Empty First Name");
     }elseif(empty($lname)){
-        $messages['danger'] = "Empty Last Name";
+      $msgs[] = array('danger'=>"Empty Last Name");
     }elseif(empty($username)){
-        $messages['danger'] = "Empty Username";
+      $msgs[] = array('danger'=>"Empty Username");
     }elseif(empty($email)){
-        $messages['danger'] = "Empty Email";
+      $msgs[] = array('danger'=>"Empty Email");
     }elseif(empty($pass)){
-        $messages['danger'] = "Empty Password";
+      $msgs[] = array('danger'=>"Empty Password");
+    }elseif($pass != $confPass){
+      $msgs[] = array('danger'=>"Password is not the Same");
     }else{
-
-        // CONTINUE WITH REGISTRATION
-        $messages = $user->addAccount($fname, $lname, $username, $email, $pass);
-        if(isset($messages['success'])){
-            //redirect to login with successfull message.
-
-        }
+      // CONTINUE WITH REGISTRATION
+      $msgs[] = $user->addAccount($fname, $lname, $username, $email, $pass);
+      /*
+      if(isset($messages['success'])){
+        //redirect to login with successfull message.
+        $msgs[] = array('success'=>$messages['success']);        
+      }else{
+        $msgs[] = array('danger'=>$messages['danger']); 
+      }*/
     }
 
   }
   ?>
   
   <?php 
+  
   // setup var for the header
-  $title = "Register | PHP Login System";
+  $title = "Register | ".$WebsiteName;
   include ($directory.'/include/header.php');
   ?>
   
   <div class="container">
-  <div class="row">
-      <div class="col">
-      </div>
-      <div class="col text-center">
+  
+  <div class="row justify-content-center my-5">
+    <?php msgs($msgs) ?>
+      <div class="col-lg-4 col-sm-12 col-md-6 text-center">
         <h3>Register</h3>
         <br/>
-        <?php 
+        <?php /*
         if(isset($messages) && !empty($messages)){
           foreach ($messages as $key=>$message ){
             echo "<div class='alert alert-$key' role='alert'>".$message."</div>";         
           }
-        }
+        } */
     ?>
         
         <form method="POST" action="register">
@@ -118,8 +119,6 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
           <hr />
           
         </form>
-      </div>
-      <div class="col">
       </div>
   </div>
   </div> 

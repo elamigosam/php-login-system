@@ -28,7 +28,7 @@ if(isset($_GET['msg'])){
 
 
 // INCLUDE THE HEADER TO INCLUDE THE NAV AND MENUS.
-$title = "Admin | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Admin | ".$WebsiteName; // SETUP THE TITLE VAR FOR THE title tag
 include ($directory.'/include/header.php');
 include ($directory.'/include/nav.php');
 
@@ -40,8 +40,8 @@ if(isset($url_path['1'])){
     $subPage = filter_var($url_path['1'], FILTER_SANITIZE_STRING);
     // find the page on the pages directory
     
-    if(file_exists($directory."/pages/sub/".$subPage.".php")){
-        require_once $directory."/pages/sub/".$subPage.".php";
+    if(file_exists($directory."/pages/admin/".$subPage.".php")){
+        require_once $directory."/pages/admin/".$subPage.".php";
     }else{
         // Bad URL Page      
         echo "Page Not Found";  

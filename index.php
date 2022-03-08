@@ -1,12 +1,9 @@
 <?php
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-//echo "<pre>";
-//print_r($_SERVER);
-//echo "</pre>";
+ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
+
+//echo "<pre>"; print_r($_SERVER); echo "</pre>";
 
 /*
 Start session
@@ -21,11 +18,9 @@ load the page
 DEFINE SOME VARIABLES 
 */
 $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
-// siteName is used for the second part of the title tag
-$siteName = "PHP Login System";
 //directory is used to include scripts or files
 $directory = $_SERVER['DOCUMENT_ROOT'];
-// currentUrl gives the current url of the loaded page, for displaying the url. 
+// currentUrl gives the current url of the loaded page, for displaying the url in links
 $currentUrl = $url.$_SERVER['REQUEST_URI'];
 
 
@@ -38,7 +33,6 @@ array("Folder", "Sample-Page-Title")
 */
 $request_uri = explode( "?", $_SERVER['REQUEST_URI']); // split the path from the query 
 $url_path = array_values(array_filter(explode("/", $request_uri['0']))); // array of different paths with removed empty arrays
-
 
 //var_dump($url_path);
 
@@ -67,14 +61,11 @@ if($user->sessionLogin()){
   $auth = false;
 }
 
-
 // FIND AND LOAD THE PAGE
 // find the page on the pages directory
 if(file_exists($directory."/pages/".$page.".php")){
   require_once $directory."/pages/".$page.".php";
-}
-
-else{
+}else{
   // FILE DOESNT EXIST, THERE FOR IS AN INVALID PAGE, INCLUDE 404 PAGE
   include $directory."/pages/404.php";
 }

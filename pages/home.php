@@ -1,5 +1,4 @@
 <?php
-
 // GET THE USER INFO 
 $userInfo = $user->getUserInfoById();
 if(!$userInfo){
@@ -8,9 +7,8 @@ if(!$userInfo){
   die();
 }
 
-//$debug = $userInfo;
 
-$title = "Home | PHP Login System"; // SETUP THE TITLE VAR FOR THE title tag
+$title = "Home | ".$WebsiteName; // SETUP THE TITLE VAR FOR THE title tag
 include ($directory.'/include/header.php');
 include ($directory.'/include/nav.php');
 ?>
