@@ -14,5 +14,11 @@ $smtpPassword = 'Password123';
 $smtpPort = 587; 
 $smtpFrom = "username@gmail.com";
 $smtpFromName = "Php Login System Website";
+// recaptcha settings
+$enable_recaptcha = false;
+$recaptcha_site_key = "";
+$recaptcha_secret_key = "";
 
+// webisite Settings 
+$WebsiteName = "PHP Login System";
 
