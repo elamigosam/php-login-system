@@ -164,6 +164,11 @@ class User{
                 return array('danger' => "Email Address already exists");
             }
 
+            // check if username exists
+            if($this->usernameExists($username)){
+                return array('danger'=>"Username Already Exists");                
+            }
+
             $hash = password_hash($passwd, PASSWORD_DEFAULT);
 
             // Generate random 32 character hash and assign it to a local variable.// Example output: f4552671f8909587cf485ea990207f3b
@@ -220,6 +225,30 @@ class User{
     
 
 
+        if($stmt->rowCount() == 1){
+            return true;
+        }
+        else{
+            //echo mysqli_error($link);
+            return false;
+            die("Database Error");
+        }
+    }
+
+    function usernameExists(string $username): ?int{ // RETURNS FALSE OR id NUMBER
+        // returns false or ID number
+        global $pdo;
+        
+        $email = filter_var($username, FILTER_SANITIZE_EMAIL);
+        if(empty($email)){
+            return false;
+        }
+
+        $q = "SELECT id FROM `users` WHERE username = :username LIMIT 1";
+        $stmt = $pdo->prepare($q);
+        $stmt->execute(['username'=>$username]);
+        $user = $stmt->fetch();
+    
         if($stmt->rowCount() == 1){
             return true;
         }
