@@ -25,7 +25,6 @@ ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
-
 --
 -- Table structure for table `account_sessions`
 --
@@ -41,7 +40,3 @@ CREATE TABLE `sessions` (
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`session_id`);
-
-
-
-

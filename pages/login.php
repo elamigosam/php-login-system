@@ -126,6 +126,7 @@ include (__DIR__.'/../include/header.php');
 </div>
 </div> 
 
+<?php if($enable_recaptcha){ ?>
 <script src="https://www.google.com/recaptcha/api.js?render=<?php echo $recaptcha_site_key ?>"></script>
 <script>
     grecaptcha.ready(function() {
@@ -138,6 +139,7 @@ include (__DIR__.'/../include/header.php');
         });
     });
 </script>
+<?php } ?>
 
 
 

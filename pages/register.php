@@ -24,37 +24,71 @@ if(isset($_GET['code']) && isset($_GET['email'])){
 
 // fname, lname, username, email, password
 // PROCESS THE REGISTRATION
+
+
 if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])){
 
-    $fname = filter_var($_POST['fname'], FILTER_SANITIZE_STRING);
-    $lname = filter_var($_POST['lname'], FILTER_SANITIZE_STRING);
-    $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $pass = $_POST['password'];
-    $confPass = $_POST['confirm-password'];
-
-    if(empty($fname)){
-      $msgs[] = array('danger'=>"Empty First Name");
-    }elseif(empty($lname)){
-      $msgs[] = array('danger'=>"Empty Last Name");
-    }elseif(empty($username)){
-      $msgs[] = array('danger'=>"Empty Username");
-    }elseif(empty($email)){
-      $msgs[] = array('danger'=>"Empty Email");
-    }elseif(empty($pass)){
-      $msgs[] = array('danger'=>"Empty Password");
-    }elseif($pass != $confPass){
-      $msgs[] = array('danger'=>"Password is not the Same");
-    }else{
-      // CONTINUE WITH REGISTRATION
-      $msgs[] = $user->addAccount($fname, $lname, $username, $email, $pass);
-      /*
-      if(isset($messages['success'])){
-        //redirect to login with successfull message.
-        $msgs[] = array('success'=>$messages['success']);        
+    // check if recaptcha is enabled
+    if($enable_recaptcha){
+      if(isset($_POST['token']) && isset($_POST['action'])){
+        $token = $_POST['token'];
+        $action = $_POST['action'];
+        
+        // call curl to POST request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $recaptcha_secret_key, 'response' => $token)));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $arrResponse = json_decode($response, true);
+        // verify the response
+        if($arrResponse["success"] == '1' && $arrResponse["action"] == $action && $arrResponse["score"] >= 0.7) {
+          $recaptcha = true;
+        }else{
+          $recaptcha = false;
+        }
       }else{
-        $msgs[] = array('danger'=>$messages['danger']); 
-      }*/
+        $recaptcha = false;
+      }
+    }else{
+      $recaptcha = true;
+    }
+
+    if($recaptcha){
+      $fname = filter_var($_POST['fname'], FILTER_SANITIZE_STRING);
+      $lname = filter_var($_POST['lname'], FILTER_SANITIZE_STRING);
+      $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
+      $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+      $pass = $_POST['password'];
+      $confPass = $_POST['confirm-password'];
+
+      if(empty($fname)){
+        $msgs[] = array('danger'=>"Empty First Name");
+      }elseif(empty($lname)){
+        $msgs[] = array('danger'=>"Empty Last Name");
+      }elseif(empty($username)){
+        $msgs[] = array('danger'=>"Empty Username");
+      }elseif(empty($email)){
+        $msgs[] = array('danger'=>"Empty Email");
+      }elseif(empty($pass)){
+        $msgs[] = array('danger'=>"Empty Password");
+      }elseif($pass != $confPass){
+        $msgs[] = array('danger'=>"Password is not the Same");
+      }else{
+        // CONTINUE WITH REGISTRATION
+        $msgs[] = $user->addAccount($fname, $lname, $username, $email, $pass);
+        /*
+        if(isset($messages['success'])){
+          //redirect to login with successfull message.
+          $msgs[] = array('success'=>$messages['success']);        
+        }else{
+          $msgs[] = array('danger'=>$messages['danger']); 
+        }*/
+      }
+    }else{
+      $msgs[] = array('danger'=>"Failed Captcha Verification");
     }
 
   }
@@ -122,5 +156,20 @@ if(isset($_POST['submit']) && isset($_POST['fname']) && isset($_POST['lname']) &
       </div>
   </div>
   </div> 
+
+  <?php if($enable_recaptcha){ ?>
+<script src="https://www.google.com/recaptcha/api.js?render=<?php echo $recaptcha_site_key ?>"></script>
+<script>
+    grecaptcha.ready(function() {
+    // do request for recaptcha token
+    // response is promise with passed token
+        grecaptcha.execute('<?php echo $recaptcha_site_key ?>', {action:'validate_captcha'})
+                  .then(function(token) {
+            // add token value to form
+            document.getElementById('token').value = token;
+        });
+    });
+</script>
+<?php } ?>
   
   <?php include($directory.'/include/footer.php'); ?>
